@@ -29,7 +29,7 @@ await csvRead().then((results) => {
    
     results.forEach(element => {
 
-      concatResult.push( element.NAME + ' '+ element.AGE );
+      concatResult.push( element.ACCOUNT + ' '+ element.AMOUNT );
     });
   console.log("concatResult: ",concatResult ) ;
 })
@@ -64,6 +64,11 @@ app.get('/GetProof', async (req, res) => {
 
     const proof = tree.getProof(req.query.leaf) ;
 
+    proof.forEach(x => { 
+
+      x.data = x.data.toString('hex') ;  
+    })
+
     res.send(proof);
 
 } )
@@ -86,9 +91,12 @@ app.post('/VerifyleafProof', jsonParser, async (req, res) => {
 
      console.log( req.body ) ;
     // console.log(tree.verify(proof, Tree['level1'][0], root)) // true
-    const verify = tree.verify(req.body.proof, req.query.leaf, req.body.root) ;
+    const verify = tree.verify(req.body.proof, req.body.leaf, req.body.root) ;
 
-    res.send(verify);
+    if (verify) 
+    res.send('Proof validation successfully !! Thanks ');
+    else
+    res.send('Proof validation unsuccessfully !! Try Again') ; 
 
 } )
 

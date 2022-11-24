@@ -4,6 +4,23 @@ var csvRead = require('./ParseCSV.js') ;
 
 async function markelTress( ) { 
 
+    // Internally, trees are made of nodes containing Buffer values only
+  // This helps ensure that leaves being added are Buffers, and will convert hex to Buffer if needed
+  function _getBuffer (value) {
+    if (value instanceof Buffer) { // we already have a buffer, so return it
+      return value
+    } else if (_isHex(value)) { // the value is a hex string, convert to buffer and return
+      return Buffer.from(value, 'hex')
+    } else { // the value is neither buffer nor hex string, will not process this, throw error
+      throw new Error("Bad hex value - '" + value + "'")
+    }
+  }
+
+  function _isHex (value) {
+    var hexRegex = /^[0-9A-Fa-f]{2,}$/
+    return hexRegex.test(value)
+  }
+
 var concatResult = [] ; 
 var Tree = { } ;
 
@@ -43,7 +60,26 @@ console.log( 'root: ',root);
 // const leaf = SHA256('a')
 // console.log("Leaf a :",leaf);
  const proof = tree.getProof(Tree['level1'][0]) ;
- console.log('Proof of 0:  ',proof) ; 
+
+ proof.forEach(x => { 
+
+    x.data = x.data.toString('hex') ;  
+ })
+
+
+ console.log('Proof of 0 HEX:  ',proof) ; 
+
+//  proof.forEach(x => { 
+
+//   x.data =  _getBuffer (x.data);  
+// })
+
+console.log('Proof of 0 buffer:  ',proof) ; 
+
+console.log('Tree leaf: ',Tree['level1'][0]) ;
+
+console.log('ROOT: ',root) ;
+
 console.log(tree.verify(proof, Tree['level1'][0], root)) // true
 
 }
