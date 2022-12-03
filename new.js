@@ -1,7 +1,9 @@
 const { MerkleTree } = require('merkletreejs') ;
-const SHA256 = require('crypto-js/sha256') ;
+const crypto = require('crypto') ;
 var csvRead = require('./ParseCSV.js') ;
 var bodyParser = require('body-parser')
+
+var hash = crypto.createHash('sha256') ; 
 
 const express = require('express')
 const app = express()
@@ -29,14 +31,27 @@ await csvRead().then((results) => {
    
     results.forEach(element => {
 
-      concatResult.push( element.ACCOUNT + ' '+ element.AMOUNT );
+      concatResult.push( element.UserID + ' '+ element.Quantity );
     });
-  console.log("concatResult: ",concatResult ) ;
+  //console.log("concatResult: ",concatResult ) ;
 })
 
- tree = new MerkleTree(concatResult, SHA256)
-// console.log('Leaves: ',tree.leaves[0].toString('hex'));
-// console.log('Tree: ',tree.layers);
+var hashArray = [] ;
+var hashOfElement ;
+concatResult.forEach(element => { 
+
+  const h = crypto.createHash('sha256').update(element).digest('hex');
+
+  hashArray.push(h) ;
+})
+
+console.log('hashArray: ', hashArray[1]) ; 
+console.log(typeof hashArray)
+
+tree = new MerkleTree(hashArray) ;
+
+console.log('Leaves: ',tree.leaves[0].toString('hex'));
+console.log('Tree: ',tree.layers);
 
 var arry = [] ; 
 var foo =1 ;

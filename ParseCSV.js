@@ -6,7 +6,7 @@ const results = [];
 const csvRead = function bd() {
   return new Promise((resolve, reject) => {
       
-    fs.createReadStream('data.csv')
+    fs.createReadStream('MockDataforExchangeSetup.csv')
           .pipe(csv())
           .on('data', (data) => results.push(data))
           .on('end', () => {
